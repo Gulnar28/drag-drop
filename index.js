@@ -1,65 +1,66 @@
+const dragDrop = document.querySelector(".drag-drop");
+const input = document.querySelector(".file input");
+const images = document.querySelector(".file .images");
 
+let file;
 
+dragDrop.addEventListener("click", () => {
+  input.click();
+});
 
-const DragArea = document.querySelector(".AppBody"),
-DragText = DragArea.querySelector("h3"),
-button = DragArea.querySelector("button"),
-input  = DragArea.querySelector("input");
-let Myfile ; 
+input.addEventListener('change',function(){
+    file = this.files[0];
+    displayFile();
+})
 
+dragDrop.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dragDrop.classList.add("active");
+});
 
+dragDrop.addEventListener("dragleave", () => {
+  dragDrop.classList.remove("active");
+});
 
-button.onclick  = () => {
-    input.click()
-}
+dragDrop.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dragDrop.classList.remove("active");
+  file = e.dataTransfer.files[0];
+  displayFile()
+  
+});
 
-input.addEventListener("change" ,function(){
-    Myfile = this.files[0];
-    DragArea.classList.add("active"); 
-    ShowMe()
+const upload = document.querySelector('.file .btn');
+upload.addEventListener('click',()=>{
+  if(images.innerHTML===''){
+    alert("Please browse a file");
+  }else{
+    images.innerHTML='';
+  }
     
 })
 
-DragArea.addEventListener("dragover", (event)=> {
-event.preventDefault(); 
-DragArea.classList.add("active"); 
+function displayFile(){
+    let fileType = file.type;
 
-DragText.textContent = "Release to Upload File";
+  let validExtensions = ["image/jpeg", "image/jpg", "image/png"];
 
-} ) 
+  if (validExtensions.includes(fileType)) {
+    let fileReader = new FileReader();
 
-DragArea.addEventListener("dragleave",  ()=> {
-    DragArea.classList.remove("active"); 
-    DragText.textContent = "Drag & Drop";
-}); 
-
-
-DragArea.addEventListener("drop", (event)=>{ 
-    event.preventDefault();
-    Myfile = event.dataTransfer.files[0];
-
-    ShowMe()
-})
-
-function ShowMe(){
-    let filetype = Myfile.type; 
-    let VaildEx =  ["image/jpeg", "image/jpg", "image/png"];
-
-    if(VaildEx.includes(filetype)){
-        
-      let fileReader  = new FileReader(); 
-
-      fileReader.onload = () => {
-          let imgUrl = fileReader.result; 
-          let img  = `<img src="${imgUrl}" alt="">`
-
-          DragArea.innerHTML = img
-      }
-      fileReader.readAsDataURL(Myfile); 
-    }
-    else  {
-        alert(""); 
-        DragArea.classList.remove("active"); 
-        DragText.textContent = "Drag & Drop";
-    }
+    fileReader.onload = () => {
+      let fileURL = fileReader.result;
+      let img = `<div class="box"><div class="img"><img src="${fileURL}"> <div class="text"><h4>${file.name}</h4> <p>image <span></span> ${file.size} <span></span> ${file.type.substring(6)} </p></div> </div><i class="fa-solid fa-xmark"></i></div>`;
+      images.innerHTML += img;
+      const deleteButtons = document.querySelectorAll(".file .images .box i");
+      deleteButtons.forEach((deleteButton) => {
+        deleteButton.addEventListener("click", () => {
+          deleteButton.parentElement.remove();
+        });
+      });
+    };
+    fileReader.readAsDataURL(file);
+  } else {
+    alert("This file is not an image");
+  }
 }
